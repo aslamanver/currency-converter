@@ -1,6 +1,5 @@
 package com.aslam.currencyconverter.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +7,7 @@ import android.widget.BaseAdapter
 import com.aslam.currencyconverter.databinding.RateListRowBinding
 import com.aslam.currencyconverter.models.CurrencyRate
 
-class CurrencyExchangeAdapter(
-    var context: Context,
-    private var sourceRateList: MutableList<CurrencyRate> = ArrayList()
-) : BaseAdapter() {
+class CurrencyExchangeAdapter(private var sourceRateList: MutableList<CurrencyRate> = ArrayList()) : BaseAdapter() {
 
     override fun getCount(): Int {
         return sourceRateList.size

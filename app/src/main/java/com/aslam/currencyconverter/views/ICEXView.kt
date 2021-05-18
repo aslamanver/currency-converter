@@ -1,8 +1,10 @@
 package com.aslam.currencyconverter.views
 
-import com.aslam.currencyconverter.models.AppData
-
 interface ICEXView {
-    fun onAPIDataAvailable(appData: AppData)
+    fun initUI()
+    fun onAPIDataAvailable()
     fun onAPIError(ex: Exception)
+    fun getUserAmount(): Double
+    fun getUserCurrency(): String
+    fun getUserQuery(): String
 }
