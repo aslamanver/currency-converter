@@ -1,21 +1,37 @@
 package com.aslam.currencyconverter
 
-import org.junit.Test
-
+import android.content.Context
+import com.aslam.currencyconverter.models.CurrencyRate
+import com.aslam.currencyconverter.presenters.CEXPresenter
+import com.aslam.currencyconverter.views.ICEXView
 import org.junit.Assert.*
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.runners.MockitoJUnitRunner
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
+@RunWith(MockitoJUnitRunner::class)
+class UnitTest {
+
+    @Mock
+    private lateinit var mockContext: Context
+
+    @Mock
+    private lateinit var icexView: ICEXView
 
     @Test
-    fun checkPresenterAPI() {
+    fun checkPresenterUSDLKR() {
+        val cexPresenter = CEXPresenter(TestResponse.apiResponse, mockContext, icexView)
+        val currencyRate = CurrencyRate("USD", "LKR", 1.0, 0.0)
+        cexPresenter.updateCurrencyRate(currencyRate)
+        assertTrue(currencyRate.rate == 196.69072)
+    }
 
-
-
-        assertEquals(4, 2 + 2)
+    @Test
+    fun checkPresenterINRLKR() {
+        val cexPresenter = CEXPresenter(TestResponse.apiResponse, mockContext, icexView)
+        val currencyRate = CurrencyRate("INR", "LKR", 1.0, 0.0)
+        cexPresenter.updateCurrencyRate(currencyRate)
+        assertTrue(currencyRate.rate == 2.683288360098954)
     }
 }

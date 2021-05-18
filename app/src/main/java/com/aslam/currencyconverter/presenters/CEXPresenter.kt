@@ -10,12 +10,33 @@ import com.retrofit.lite.services.APITask
 import org.json.JSONObject
 import java.util.*
 
-class CEXPresenter(private var context: Context, private var icxView: ICEXView) : ICEXPresenter {
+class CEXPresenter : ICEXPresenter {
 
-    var appData: AppData
+    private var context: Context
+    private var icxView: ICEXView
+    private var response: String
+    lateinit var appData: AppData
 
-    init {
-        appData = StorageHelper.getAppData(context)
+    constructor(context: Context, icxView: ICEXView) {
+        this.context = context
+        this.icxView = icxView
+        this.response = ""
+        init()
+    }
+
+    constructor(response: String, context: Context, icxView: ICEXView) {
+        this.context = context
+        this.icxView = icxView
+        this.response = response
+        init()
+    }
+
+    private fun init() {
+        appData = if (response.isNotEmpty()) {
+            prepareAPIData(response)
+        } else {
+            StorageHelper.getAppData(context)
+        }
         icxView.initUI()
     }
 
@@ -41,20 +62,7 @@ class CEXPresenter(private var context: Context, private var icxView: ICEXView) 
 
             override fun onSuccess(pid: Int, status: Int, headers: Map<String, String>, body: String) {
 
-                val jsonResponse = JSONObject(body)
-                val quotes = jsonResponse.getJSONObject("quotes")
-                val from = jsonResponse.getString("source");
-                val keys = quotes.names()
-
-                for (i in 0 until keys.length()) {
-
-                    val to = keys.getString(i).substring(3, 6)
-                    val rate = quotes.getDouble(keys.getString(i))
-
-                    appData.currencyRatesMap[keys.getString(i)] = CurrencyRate(from, to, 1.0, rate)
-                }
-
-                appData = AppData(appData.currencyRatesMap)
+                appData = prepareAPIData(body)
                 StorageHelper.storeAppData(context, appData)
 
                 icxView.onAPIDataAvailable()
@@ -64,5 +72,22 @@ class CEXPresenter(private var context: Context, private var icxView: ICEXView) 
                 icxView.onAPIError(ex)
             }
         })
+    }
+
+    override fun prepareAPIData(body: String): AppData {
+
+        val appData = AppData(mutableMapOf())
+        val jsonResponse = JSONObject(body)
+        val quotes = jsonResponse.getJSONObject("quotes")
+        val from = jsonResponse.getString("source");
+        val keys = quotes.names()
+
+        for (i in 0 until keys.length()) {
+            val to = keys.getString(i).substring(3, 6)
+            val rate = quotes.getDouble(keys.getString(i))
+            appData.currencyRatesMap[keys.getString(i)] = CurrencyRate(from, to, 1.0, rate)
+        }
+
+        return appData
     }
 }
